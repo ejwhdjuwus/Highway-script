@@ -1,0 +1,116 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+
+local player = Players.LocalPlayer
+local SpawnRemote = ReplicatedStorage:WaitForChild("SpawnCar")
+
+-- GUI
+local gui = Instance.new("ScreenGui")
+gui.Parent = player.PlayerGui
+gui.Name = "CarSpawnerPro"
+
+-- MAIN FRAME
+local frame = Instance.new("Frame",gui)
+frame.Size = UDim2.new(0,350,0,260)
+frame.Position = UDim2.new(0.5,-175,0.5,-130)
+frame.BackgroundColor3 = Color3.fromRGB(25,25,25)
+frame.Active = true
+frame.Draggable = true
+
+-- TITLE
+local title = Instance.new("TextLabel",frame)
+title.Size = UDim2.new(1,0,0,35)
+title.BackgroundColor3 = Color3.fromRGB(40,40,40)
+title.Text = "CAR SPAWNER"
+title.TextColor3 = Color3.new(1,1,1)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 16
+
+-- CLOSE
+local close = Instance.new("TextButton",frame)
+close.Size = UDim2.new(0,30,0,30)
+close.Position = UDim2.new(1,-35,0,2)
+close.Text = "X"
+close.BackgroundColor3 = Color3.fromRGB(170,0,0)
+close.TextColor3 = Color3.new(1,1,1)
+
+close.MouseButton1Click:Connect(function()
+	gui:Destroy()
+end)
+
+-- MINIMIZE
+local minimize = Instance.new("TextButton",frame)
+minimize.Size = UDim2.new(0,30,0,30)
+minimize.Position = UDim2.new(1,-70,0,2)
+minimize.Text = "-"
+minimize.BackgroundColor3 = Color3.fromRGB(80,80,80)
+minimize.TextColor3 = Color3.new(1,1,1)
+
+-- SCROLL
+local scroll = Instance.new("ScrollingFrame",frame)
+scroll.Size = UDim2.new(1,-20,0,150)
+scroll.Position = UDim2.new(0,10,0,45)
+scroll.BackgroundColor3 = Color3.fromRGB(35,35,35)
+scroll.ScrollBarThickness = 6
+
+local layout = Instance.new("UIListLayout",scroll)
+layout.Padding = UDim.new(0,4)
+
+-- SPAWN BUTTON
+local spawn = Instance.new("TextButton",frame)
+spawn.Size = UDim2.new(1,-20,0,40)
+spawn.Position = UDim2.new(0,10,1,-50)
+spawn.Text = "SPAWN SELECTED CAR"
+spawn.BackgroundColor3 = Color3.fromRGB(0,170,0)
+spawn.TextColor3 = Color3.new(1,1,1)
+spawn.Font = Enum.Font.GothamBold
+
+-- SADECE 2 ARABA
+local cars = {
+"BWM M8 GTE - Stock",
+"Muclahen Speed GTR - Stock"
+}
+
+local selected = nil
+
+for _,car in pairs(cars) do
+
+	local b = Instance.new("TextButton",scroll)
+	b.Size = UDim2.new(1,-5,0,35)
+	b.Text = car
+	b.BackgroundColor3 = Color3.fromRGB(60,60,60)
+	b.TextColor3 = Color3.new(1,1,1)
+
+	b.MouseButton1Click:Connect(function()
+		selected = car
+		spawn.Text = "SPAWN "..car
+	end)
+
+end
+
+scroll.CanvasSize = UDim2.new(0,0,0,layout.AbsoluteContentSize.Y)
+
+-- SPAWN
+spawn.MouseButton1Click:Connect(function()
+	if selected then
+		SpawnRemote:FireServer(selected)
+		print("Spawned:",selected)
+	end
+end)
+
+-- MINIMIZE
+local minimized = false
+
+minimize.MouseButton1Click:Connect(function()
+	minimized = not minimized
+	
+	if minimized then
+		scroll.Visible = false
+		spawn.Visible = false
+		frame.Size = UDim2.new(0,350,0,40)
+	else
+		scroll.Visible = true
+		spawn.Visible = true
+		frame.Size = UDim2.new(0,350,0,260)
+	end
+end)
